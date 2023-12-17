@@ -8,6 +8,8 @@ pygame.init()
 tileSize = 30
 boardWidth = 20
 
+cells = [[i, j] for i in range(boardWidth) for j in range(boardWidth)]
+
 red = (255, 0, 0)
 green = (0, 255, 0)
 black = (0, 0, 0)
@@ -62,7 +64,7 @@ while exit == False:
     dt = clock.tick()
     timeSinceSnakeMove += dt
     pygame.draw.rect(screen, red, food)
-    if timeSinceSnakeMove > 300:
+    if timeSinceSnakeMove > 200:
 
         screen.fill(black)
         moveRet = move(snake, snakeMovementX, SnakeMovementY, foodPosX, foodPosY)
@@ -89,12 +91,10 @@ while exit == False:
                 pygame.draw.rect(screen, green, block)
 
         if moveRet[1] == True:
-            snakeX = [i[0] for i in snake]
-            snakeY = [i[1] for i in snake]
-            freeCellsX = [i for i in range(boardWidth) if i not in snakeX]
-            freeCellsY = [i for i in range(boardWidth) if i not in snakeY]
-            foodPosX = random.choice(freeCellsX)
-            foodPosY = random.choice(freeCellsY)
+            freeCells = [i for i in cells if i not in snake]
+            chosenCell = random.choice(freeCells)
+            foodPosX = chosenCell[0]
+            foodPosY = chosenCell[1]
             foodCoordsX = tileSize*foodPosX
             foodCoordsY = tileSize*foodPosY
             food = pygame.Rect(foodCoordsX, foodCoordsY, tileSize, tileSize)
@@ -122,18 +122,25 @@ while exit == False:
                 snakeMovementX = 1
                 SnakeMovementY = 0
 
-label = my_font.render("Game Over", 1, white)
-label_rect = label.get_rect()
-label_rect.center = (boardWidth*tileSize/2, boardWidth+50)
-label2 = my_font.render("Score:" + str(len(snake)), 1, white)
-label2_rect = label2.get_rect()
-label2_rect.center = (boardWidth*tileSize/2, boardWidth + 140)
-screen.blit(label, label_rect)
-screen.blit(label2, label2_rect)
-pygame.display.flip()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+    while exit == True:
+        label = my_font.render("Game Over", 1, white)
+        label_rect = label.get_rect()
+        label_rect.center = (boardWidth*tileSize/2, boardWidth+50)
+        label2 = my_font.render("Length:" + str(len(snake)), 1, white)
+        label2_rect = label2.get_rect()
+        label2_rect.center = (boardWidth*tileSize/2, boardWidth + 140)
+        screen.blit(label, label_rect)
+        screen.blit(label2, label2_rect)
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    snakeMovementX = 1
+                    SnakeMovementY = 0
+                    snake = [[5,2],[4,2],[3,2]]
+                    exit = False
